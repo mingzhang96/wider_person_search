@@ -6,7 +6,7 @@ import os.path as osp
 from eval import eval
 from utils.pkl import my_unpickle
 from scipy.spatial.distance import pdist, squareform
-from diffussion import *
+from utils.diffussion import *
 from crow import apply_crow_aggregation, normalize, run_feature_processing_pipeline
 
 K = 100 # approx 50 mutual nns
