@@ -2,6 +2,7 @@ import numpy
 import os
 import os.path as osp
 import json
+from random import shuffle
 import argparse
 
 
@@ -22,7 +23,7 @@ def parse_submission(submission_file):
             if x not in appeared_set:
                 unique_ret.append(x)
                 appeared_set.add(x)
-        submission[key] = ret
+        submission[key] = unique_ret
     return submission
 
 
@@ -48,7 +49,6 @@ def get_AP(gt_set, ret_list):
 
 
 def get_mAP(gt_dict, ret_dict):
-    all_ap = []
     mAP = 0.0
     query_num = len(gt_dict.keys())
     for key, gt_set in gt_dict.items():
@@ -56,25 +56,23 @@ def get_mAP(gt_dict, ret_dict):
             AP = 0
         else:
             AP = get_AP(gt_set, ret_dict[key])
-        all_ap.append(AP)
         mAP += AP
-        if AP == 1: print(key)
     mAP /= query_num
-    return mAP, all_ap
+    return mAP
 
 
 def eval(submission_file, gt_file):
     gt_dict = read_gt(gt_file)
     submission = parse_submission(submission_file)
-    mAP, all_ap = get_mAP(gt_dict, submission)
+    mAP = get_mAP(gt_dict, submission)
     print('mAP: {:.4f}'.format(mAP))
-    return all_ap
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('submission', type=str)
-    parser.add_argument('--gt', type=str, default='./val_label.json')
+    parser.add_argument('--gt', type=str)
+    parser.add_argument('--submission', type=str)
     args = parser.parse_args()
 
     eval(args.submission, args.gt)
+
