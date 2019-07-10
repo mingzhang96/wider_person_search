@@ -71,7 +71,7 @@ def cg_diffusion(qsims, Wn, alpha = 0.99, maxiter = 10, tol = 1e-3):
         out_sims.append(f.reshape(-1,1))
     out_sims = np.concatenate(out_sims, axis = 1)
     ranks = np.argsort(-out_sims, axis = 0)
-    return ranks
+    return out_sims,ranks
 
 def fsr_rankR(qsims, Wn, alpha = 0.99, R = 2000):
     vals, vecs = s_linalg.eigsh(Wn, k = R)

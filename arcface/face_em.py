@@ -25,6 +25,16 @@ def get_model(ctx, image_size, model, layer):
     model.set_params(arg_params, aux_params)
     return model
 
+
+def get_input(face_img, bbox, points):
+    bbox = bbox[0:4]
+    points = points[:].reshape((2,5)).T
+    nimg = preprocess(face_img, bbox, points, image_size='112,112')
+    nimg = cv2.cvtColor(nimg, cv2.COLOR_BGR2RGB)
+    aligned = np.transpose(nimg, (2,0,1))
+    return nimg, aligned
+
+
 class FaceModel:
     def __init__(self, 
                  image_size='112,112',

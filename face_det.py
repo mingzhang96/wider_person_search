@@ -8,7 +8,7 @@ import mxnet as mx
 from utils.timer import Timer
 from utils.pkl import my_pickle
 from mtcnn.mtcnn_detector import MtcnnDetector
-from arcface.face_em import FaceModel
+from arcface.face_em import *
 
 trainval_root = '/local/home/share/safe_data_dir_3/zhangming/wider/person_search_trainval'
 test_root = '/local/home/share/safe_data_dir_3/zhangming/wider/person_search_test'
@@ -76,8 +76,8 @@ def face_exfeat(img, fbbox, landmark, face_model):
     feat = face_model.get_feature(aligned)
     return feat
 
-def face_align(img, fbbox, landmark, face_model):
-    _, aligned = face_model.get_input(img, fbbox, landmark)
+def face_align(img, fbbox, landmark):
+    _, aligned = get_input(img, fbbox, landmark)
     return aligned
 
 def main(args):
@@ -87,16 +87,16 @@ def main(args):
                             minsize = 20,
                             threshold = [0.1, 0.5, 0.9],
                             factor = 0.709,
-                            ctx=mx.gpu(args.gpu), num_worker = 4 , 
+                            ctx=mx.gpu(args.gpu), num_worker = 1 , 
                             accurate_landmark = False)
     detector_candi = MtcnnDetector(model_folder='./mtcnn/model', 
                             minsize = 20,
                             threshold = [0.5, 0.5, 0.9],
                             factor = 0.709,
-                            ctx=mx.gpu(args.gpu), num_worker = 4 , 
+                            ctx=mx.gpu(args.gpu), num_worker = 1 , 
                             accurate_landmark = False)
-    embedding = FaceModel(model='./arcface/model/model-r50-am-lfw',
-                          ctx=mx.gpu(args.gpu))
+    # embedding = FaceModel(model='./arcface/model/model-r50-am-lfw',
+    #                       ctx=mx.gpu(args.gpu))
     if is_test:
         this_dir, json_path, save_name = osp.join(test_root, 'test'), osp.join(test_root, 'test.json'), 'face_det_test.pkl'
     else:
@@ -118,7 +118,7 @@ def main(args):
             _t.tic()
             fbbox, landmark = face_det_cast(img, detector_cast)
             assert fbbox is not None, 'Cast: No face detected !'
-            aligned = face_align(img, fbbox, landmark, embedding)
+            aligned = face_align(img, fbbox, landmark)
             _t.toc()
             print('%s %d/%d ... %s %d/%d ... time: %.3f s average: %.3f s'%(movie, movie_cnt, movie_num, 
                                                 cast_id, i+1, casts_num, _t.diff, _t.average_time))
@@ -146,7 +146,7 @@ def main(args):
                     'aligned': None
                 })
                 continue
-            aligned = face_align(crop, fbbox, landmark, embedding)
+            aligned = face_align(crop, fbbox, landmark)
             _t.toc()
             print('%s %d/%d ... %s %d/%d ... time: %.3f s average: %.3f s'%(movie, movie_cnt, movie_num, 
                                                 candidate_id, i+1, candidates_num, _t.diff, _t.average_time))
@@ -161,6 +161,6 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--is-test', type=str, default='0', choices=['0', '1'])
-    parser.add_argument('--gpu', type=int, default=0)
+    parser.add_argument('--gpu', type=int, default=2)
     args = parser.parse_args()
     main(args)

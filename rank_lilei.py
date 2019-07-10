@@ -6,7 +6,7 @@ import os.path as osp
 from eval import eval
 from utils.pkl import my_unpickle
 from scipy.spatial.distance import pdist, squareform
-from utils.diffussion import *
+from diffussion import *
 from crow import apply_crow_aggregation, normalize, run_feature_processing_pipeline
 
 K = 100 # approx 50 mutual nns
@@ -36,7 +36,7 @@ def load_face(face_data):
 
         candi_f_ids, candi_f_ffeats = [], []
         for candidate in candidates:
-            if candidate['fbbox'] is not None:
+            if candidate['ffeat'] is not None:
                 candi_f_ids.append(candidate['id'])
                 candi_f_ffeats.append(candidate['ffeat'])
         candi_f_ffeats = np.array(candi_f_ffeats)
@@ -240,7 +240,6 @@ def rank_eval(res, label):
 
 def main(args):
     if args.is_test =='0':
-        # face_feat_name = 'face_em_val_model-r50-am-lfw.pkl'
         face_feat_name = 'face_em_val_model-r100-ii.pkl'
         reid_feat_name_resnet101 = 'reid_em_val_resnet101.pkl'
         reid_feat_name_densenet121 = 'reid_em_val_densenet121.pkl'
