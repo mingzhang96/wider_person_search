@@ -244,7 +244,7 @@ def rank_reranking(movie_face, movie_reid):
         max_ind = np.argsort(sims)[-4:]
         temp = np.zeros((1, candi_feats.shape[1]))
         weights = [0.1, 0.2, 0.3, 0.4]
-        print(temp.shape, temp[0].shape, candi_feats.shape, candi_feats[0].shape)
+        # print(temp.shape, temp[0].shape, candi_feats.shape, candi_feats[0].shape)
         for k, j in enumerate(max_ind):
             temp[0] += weights[k] * candi_feats[j]
         new_cast_feat[i] = temp
