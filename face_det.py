@@ -87,13 +87,13 @@ def main(args):
                             minsize = 20,
                             threshold = [0.1, 0.5, 0.9],
                             factor = 0.709,
-                            ctx=mx.gpu(args.gpu), num_worker = 1 , 
+                            ctx=mx.cpu(), num_worker = 20 , 
                             accurate_landmark = False)
     detector_candi = MtcnnDetector(model_folder='./mtcnn/model', 
                             minsize = 20,
                             threshold = [0.5, 0.5, 0.9],
                             factor = 0.709,
-                            ctx=mx.gpu(args.gpu), num_worker = 1 , 
+                            ctx=mx.cpu(), num_worker = 20 , 
                             accurate_landmark = False)
     # embedding = FaceModel(model='./arcface/model/model-r50-am-lfw',
     #                       ctx=mx.gpu(args.gpu))

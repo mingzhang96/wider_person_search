@@ -6,14 +6,8 @@ import os.path as osp
 from eval import eval
 from utils.pkl import my_unpickle
 from scipy.spatial.distance import pdist, squareform
-from utils.diffussion import *
-
-# from crow import apply_crow_aggregation, normalize, run_feature_processing_pipeline
-
-# K = 100 # approx 50 mutual nns
-# QUERYKNN = 10
-# R = 2000
-# alpha = 0.9
+from diffussion import *
+from crow import apply_crow_aggregation, normalize, run_feature_processing_pipeline
 
 
 def load_json(name):
@@ -114,7 +108,7 @@ def load_reid_4(reid_data1, reid_data2, reid_data3, reid_data4):
     return reid_dict
 
 def multi_face_recall(cast_candi_filter, candi_f_ids, candi_candi_fsim):
-    rows, cols = cast_candi_filter.shape
+    rows, cols = cast_candi_filter.shape   #n by m
 
     result = np.zeros((rows, cols))
     for i in range(rows):
@@ -123,7 +117,7 @@ def multi_face_recall(cast_candi_filter, candi_f_ids, candi_candi_fsim):
         for j in range(cols):
             sims = []
             for idx, flag in enumerate(cast_candi_filter[i]):
-                if flag != 0:
+                if flag != 0:   # cast and  candi  sims>0.39
                     sims.append(candi_candi_fsim[j, idx])
             sims = np.array(sims)
             max_sim = sims.max()
@@ -160,10 +154,10 @@ def multi_search(cast_candi_filter, candi_f_ids, candi_ids, candi_candi_dist):
     return result
 
 def ranking(X, Q):
+    K = 50 # approx 50 mutual nns
     QUERYKNN = 10
-    R = 2000
+    # R = 2000
     alpha = 0.9
-    K = 100
 
     sim = np.dot(X.T, Q)
     qsim = sim_kernel(sim).T
@@ -175,8 +169,8 @@ def ranking(X, Q):
     W = sim_kernel(A).T
     W = topK_W(W, K)
     Wn = normalize_connection_graph(W)
-    out_sims = cg_diffusion(qsim, Wn, alpha)
-    return out_sims
+    out_sims, _ = cg_diffusion(qsim, Wn, alpha)
+    return out_sims.T
 
 def simple_query_expansion(Q, data, inds, top_k=5):
     for i in range(top_k):
@@ -193,15 +187,13 @@ def rank(movie_face, movie_reid):
     candi_ids, candi_feats = movie_reid['candi_ids'], movie_reid['candi_feats']
     movie_rank = {cast_id:[] for cast_id in cast_ids}
 
-    cast_ffeats = normalize(cast_ffeats)
-    candi_f_ffeats = normalize(candi_f_ffeats)
-    candi_feats = normalize(candi_feats)
-
-    # cast_candi_fsim = ranking(cast_ffeats.T,candi_f_ffeats.T)
     # cast_candi_fsim_r = np.dot(cast_ffeats, candi_f_ffeats.T)
-    cast_candi_fsim_r = ranking(candi_f_ffeats, cast_ffeats)
-    idxs =  np.argsort(-cast_candi_fsim_r)
-    Q = simple_query_expansion(cast_ffeats,candi_f_ffeats,idxs)
+    # print(cast_candi_fsim_r.shape)
+    cast_candi_fsim_diff = ranking(candi_f_ffeats.T,cast_ffeats.T)
+    # print(cast_candi_fsim_diff.shape)
+    # cast_candi_fsim_r = np.dot(cast_ffeats, candi_f_ffeats.T)  #n cast n*512,m candi  m*512  --->n*m
+    idxs =  np.argsort(-cast_candi_fsim_diff)               #sort by score,   high --- low
+    Q = simple_query_expansion(cast_ffeats,candi_f_ffeats,idxs) #merge the topK cast features
     cast_candi_fsim = np.dot(Q, candi_f_ffeats.T)
     candi_candi_fsim = np.dot(candi_f_ffeats, candi_f_ffeats.T)
 
@@ -217,8 +209,8 @@ def rank(movie_face, movie_reid):
     for i, candi_id in enumerate(candi_f_ids):
         sim = cast_candi_fsim.T[i].copy()
         max_ind = np.argsort(sim)[-1]
-        #print(max_ind,sim[max_ind])
-        if sim[max_ind] > 0.4:
+        # print(max_ind,sim[max_ind])
+        if sim[max_ind] > 0.38:
             cast_candi_filter[max_ind, i] = 1
             movie_rank[cast_ids[max_ind]].append(candi_id)
 
@@ -297,7 +289,7 @@ def main(args):
     else:
         rank2txt(rank_list, 'val_rank.txt')
         all_ap = rank_eval('val_rank.txt', 'val_label.json')
-        print(np.sort(all_ap)[::-1])
+        # print(np.sort(all_ap)[::-1])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
