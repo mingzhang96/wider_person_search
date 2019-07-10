@@ -8,6 +8,7 @@ from utils.pkl import my_unpickle
 from scipy.spatial.distance import pdist, squareform
 from diffussion import *
 from crow import apply_crow_aggregation, normalize, run_feature_processing_pipeline
+from uutils.re_ranking_feature import *
 
 
 def load_json(name):
@@ -154,7 +155,7 @@ def multi_search(cast_candi_filter, candi_f_ids, candi_ids, candi_candi_dist):
     return result
 
 def ranking(X, Q):
-    K = 50 # approx 50 mutual nns
+    K = 100 # approx 50 mutual nns
     QUERYKNN = 10
     # R = 2000
     alpha = 0.9
@@ -194,7 +195,8 @@ def rank(movie_face, movie_reid):
     # cast_candi_fsim_r = np.dot(cast_ffeats, candi_f_ffeats.T)  #n cast n*512,m candi  m*512  --->n*m
     idxs =  np.argsort(-cast_candi_fsim_diff)               #sort by score,   high --- low
     Q = simple_query_expansion(cast_ffeats,candi_f_ffeats,idxs) #merge the topK cast features
-    cast_candi_fsim = np.dot(Q, candi_f_ffeats.T)
+    # cast_candi_fsim = np.dot(Q, candi_f_ffeats.T)
+    cast_candi_fsim = re_ranking(cast_ffeats, candi_f_ffeats)
     candi_candi_fsim = np.dot(candi_f_ffeats, candi_f_ffeats.T)
 
 
