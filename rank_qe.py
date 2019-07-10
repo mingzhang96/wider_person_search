@@ -8,7 +8,7 @@ from utils.pkl import my_unpickle
 from scipy.spatial.distance import pdist, squareform
 from diffussion import *
 from crow import apply_crow_aggregation, normalize, run_feature_processing_pipeline
-from uutils.re_ranking_feature import *
+from utils.re_ranking_feature import *
 
 
 def load_json(name):
@@ -211,7 +211,7 @@ def rank(movie_face, movie_reid):
     for i, candi_id in enumerate(candi_f_ids):
         sim = cast_candi_fsim.T[i].copy()
         max_ind = np.argsort(sim)[-1]
-        # print(max_ind,sim[max_ind])
+        print(max_ind,sim[max_ind])
         if sim[max_ind] > 0.38:
             cast_candi_filter[max_ind, i] = 1
             movie_rank[cast_ids[max_ind]].append(candi_id)

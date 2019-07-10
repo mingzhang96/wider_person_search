@@ -26,7 +26,7 @@ Minibatch: avaliable when 'MemorySave' is 'True'
 import numpy as np
 from scipy.spatial.distance import cdist
 
-def re_ranking(probFea,galFea,k1,k2,lambda_value, MemorySave = False, Minibatch = 2000):
+def re_ranking(probFea,galFea,k1=20,k2=6,lambda_value=0.3, MemorySave = False, Minibatch = 2000):
 
     query_num = probFea.shape[0]
     all_num = query_num + galFea.shape[0]    
