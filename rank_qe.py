@@ -257,7 +257,7 @@ def rank_reranking(movie_face, movie_reid):
             if candi_ids[idx] not in movie_rank[cast_id]:
                 movie_rank[cast_id].append(candi_ids[idx])
 
-    return movie_rank, recall_num
+    return movie_rank
 
 
 def rank2txt(rank, file_name):
@@ -313,8 +313,9 @@ def main(args):
         movie_face = face_dict[movie]
         movie_reid = reid_dict[movie]
         # movie_rank, recall_num = rank(movie_face, movie_reid)
-        movie_rank, recall_num = rank_reranking(movie_face, movie_reid)
-        print('movie: %s, %d/%d, recall num: %d'%(movie, i+1, movie_num, recall_num))
+        # print('movie: %s, %d/%d, recall num: %d'%(movie, i+1, movie_num, recall_num))
+        movie_rank = rank_reranking(movie_face, movie_reid)
+        print('movie: %s, %d/%d'%(movie, i+1, movie_num))
         rank_list.update(movie_rank)
 
     if args.is_test == '1':
