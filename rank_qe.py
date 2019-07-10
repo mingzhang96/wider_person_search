@@ -190,13 +190,15 @@ def rank(movie_face, movie_reid):
 
     # cast_candi_fsim_r = np.dot(cast_ffeats, candi_f_ffeats.T)
     # print(cast_candi_fsim_r.shape)
-    cast_candi_fsim_diff = ranking(candi_f_ffeats.T,cast_ffeats.T)
+    # cast_candi_fsim_diff = ranking(candi_f_ffeats.T,cast_ffeats.T)
     # print(cast_candi_fsim_diff.shape)
+    cast_candi_fsim_reranking = re_ranking(cast_ffeats, candi_f_ffeats)
     # cast_candi_fsim_r = np.dot(cast_ffeats, candi_f_ffeats.T)  #n cast n*512,m candi  m*512  --->n*m
-    idxs =  np.argsort(-cast_candi_fsim_diff)               #sort by score,   high --- low
+    # idxs =  np.argsort(-cast_candi_fsim_diff)               #sort by score,   high --- low
+    idxs = np.argsort(-cast_candi_fsim_reranking)
     Q = simple_query_expansion(cast_ffeats,candi_f_ffeats,idxs) #merge the topK cast features
-    # cast_candi_fsim = np.dot(Q, candi_f_ffeats.T)
-    cast_candi_fsim = re_ranking(cast_ffeats, candi_f_ffeats)
+    cast_candi_fsim = np.dot(Q, candi_f_ffeats.T)
+    # cast_candi_fsim = re_ranking(cast_ffeats, candi_f_ffeats)
     candi_candi_fsim = np.dot(candi_f_ffeats, candi_f_ffeats.T)
 
 
@@ -211,7 +213,7 @@ def rank(movie_face, movie_reid):
     for i, candi_id in enumerate(candi_f_ids):
         sim = cast_candi_fsim.T[i].copy()
         max_ind = np.argsort(sim)[-1]
-        print(max_ind,sim[max_ind])
+        # print(max_ind,sim[max_ind])
         if sim[max_ind] > 0.38:
             cast_candi_filter[max_ind, i] = 1
             movie_rank[cast_ids[max_ind]].append(candi_id)
