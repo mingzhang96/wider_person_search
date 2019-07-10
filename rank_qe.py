@@ -192,13 +192,10 @@ def rank(movie_face, movie_reid):
     # print(cast_candi_fsim_r.shape)
     # cast_candi_fsim_diff = ranking(candi_f_ffeats.T,cast_ffeats.T)
     # print(cast_candi_fsim_diff.shape)
-    cast_candi_fsim_reranking = re_ranking(cast_ffeats, candi_f_ffeats)
     # cast_candi_fsim_r = np.dot(cast_ffeats, candi_f_ffeats.T)  #n cast n*512,m candi  m*512  --->n*m
-    # idxs =  np.argsort(-cast_candi_fsim_diff)               #sort by score,   high --- low
-    idxs = np.argsort(-cast_candi_fsim_reranking)
+    idxs =  np.argsort(-cast_candi_fsim_diff)               #sort by score,   high --- low
     Q = simple_query_expansion(cast_ffeats,candi_f_ffeats,idxs) #merge the topK cast features
     cast_candi_fsim = np.dot(Q, candi_f_ffeats.T)
-    # cast_candi_fsim = re_ranking(cast_ffeats, candi_f_ffeats)
     candi_candi_fsim = np.dot(candi_f_ffeats, candi_f_ffeats.T)
 
 
@@ -213,7 +210,7 @@ def rank(movie_face, movie_reid):
     for i, candi_id in enumerate(candi_f_ids):
         sim = cast_candi_fsim.T[i].copy()
         max_ind = np.argsort(sim)[-1]
-        # print(max_ind,sim[max_ind])
+        print(max_ind,sim[max_ind])
         if sim[max_ind] > 0.38:
             cast_candi_filter[max_ind, i] = 1
             movie_rank[cast_ids[max_ind]].append(candi_id)
@@ -231,6 +228,36 @@ def rank(movie_face, movie_reid):
                 movie_rank[cast_id].append(candi_ids[idx])
 
     return movie_rank, recall_num
+
+
+def rank_reranking(movie_face, movie_reid):
+    cast_ids, cast_ffeats = movie_face['cast_ids'], movie_face['cast_ffeats']
+    candi_f_ids, candi_f_ffeats = movie_face['candi_f_ids'], movie_face['candi_f_ffeats']
+    candi_ids, candi_feats = movie_reid['candi_ids'], movie_reid['candi_feats']
+    movie_rank = {cast_id:[] for cast_id in cast_ids}
+
+    cast_candi_reid_sim = []
+    new_cast_feat = np.zeros((len(cast_ids), candi_feats.shape[1]))
+    cast_candi_f_sim = re_ranking(cast_ffeats, candi_f_ffeats, k1=20,k2=6,lambda_value=0.3, MemorySave = False, Minibatch = 2000)
+    for i, cast_id in enumerate(cast_ids):
+        sims = cast_candi_f_sim[i].copy()
+        max_ind = np.argsort(sims)[-4:]
+        temp = np.zeros(sims.shape)
+        weights = [0.4, 0.3, 0.2, 0.1]
+        for k, j in enumerate(max_ind):
+            temp += weights[k] * candi_feats[j]
+        new_cast_feat[i] = temp
+
+    cast_candi_reid_sim = re_ranking(new_cast_feat, candi_feats)
+
+    for i, cast_id in enumerate(cast_ids):
+        inds = np.argsort(cast_candi_reid_sim[i])
+        for idx in inds:
+            if candi_ids[idx] not in movie_rank[cast_id]:
+                movie_rank[cast_id].append(candi_ids[idx])
+
+    return movie_rank, recall_num
+
 
 def rank2txt(rank, file_name):
     with open(file_name, 'w') as f:
@@ -284,7 +311,8 @@ def main(args):
     for i, movie in enumerate(movie_list):
         movie_face = face_dict[movie]
         movie_reid = reid_dict[movie]
-        movie_rank, recall_num = rank(movie_face, movie_reid)
+        # movie_rank, recall_num = rank(movie_face, movie_reid)
+        movie_rank, recall_num = rank_reranking(movie_face, movie_reid)
         print('movie: %s, %d/%d, recall num: %d'%(movie, i+1, movie_num, recall_num))
         rank_list.update(movie_rank)
 
