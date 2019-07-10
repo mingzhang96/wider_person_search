@@ -242,10 +242,11 @@ def rank_reranking(movie_face, movie_reid):
     for i, cast_id in enumerate(cast_ids):
         sims = cast_candi_f_sim[i].copy()
         max_ind = np.argsort(sims)[-4:]
-        temp = np.zeros(sims.shape)
-        weights = [0.4, 0.3, 0.2, 0.1]
+        temp = np.zeros((1, candi_feats.shape[1]))
+        weights = [0.1, 0.2, 0.3, 0.4]
+        print(temp.shape, temp[0].shape, candi_feats.shape, candi_feats[0].shape)
         for k, j in enumerate(max_ind):
-            temp += weights[k] * candi_feats[j]
+            temp[0] += weights[k] * candi_feats[j]
         new_cast_feat[i] = temp
 
     cast_candi_reid_sim = re_ranking(new_cast_feat, candi_feats)
