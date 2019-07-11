@@ -75,7 +75,7 @@ def load_face_2(face_data1, face_data2):
                 assert candidate['id'] == face_data2[movie]['candidates'][index]['id']
                 feat = np.hstack((feat1, feat2))
                 candi_f_ids.append(candidate['id'])
-                candi_f_ffeats.append(ffeat)
+                candi_f_ffeats.append(feat)
         candi_f_ffeats = np.array(candi_f_ffeats)
 
         face_dict.update(
