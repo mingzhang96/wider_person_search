@@ -59,8 +59,8 @@ def load_face_2(face_data1, face_data2):
 
         cast_ids, cast_ffeats = [], []
         for index, cast in enumerate(casts):
-            fea1 = cast['ffeat']
-            fea2 = face_data2[movie]['cast'][index]['ffeat']
+            feat1 = cast['ffeat']
+            feat2 = face_data2[movie]['cast'][index]['ffeat']
             assert cast['id'] == face_data2[movie]['cast'][index]['id']
             feat = np.hstack((feat1, feat2))
             cast_ffeats.append(feat)
@@ -70,8 +70,8 @@ def load_face_2(face_data1, face_data2):
         candi_f_ids, candi_f_ffeats = [], []
         for index, candidate in enumerate(candidates):
             if candidate['ffeat'] is not None:
-                fea1 = candidate['ffeat']
-                fea2 = face_data2[movie]['candidates'][index]['ffeat']
+                feat1 = candidate['ffeat']
+                feat2 = face_data2[movie]['candidates'][index]['ffeat']
                 assert candidate['id'] == face_data2[movie]['candidates'][index]['id']
                 feat = np.hstack((feat1, feat2))
                 candi_f_ids.append(candidate['id'])
