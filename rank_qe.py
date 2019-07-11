@@ -74,10 +74,7 @@ def load_face_2(face_data1, face_data2):
             feat2 = face_data2[movie]['cast'][index]['ffeat']
             assert cast['id'] == face_data2[movie]['cast'][index]['id']
             feat = np.hstack((feat1, feat2))
-            print("before", feat.shape, feat)
             feat = my_norm(feat)
-            print("after", feat.shape, feat)
-            exit()
             cast_ffeats.append(feat)
             cast_ids.append(cast['id'])
         cast_ffeats = np.array(cast_ffeats)
@@ -306,7 +303,7 @@ def rank_lilei(movie_face, movie_reid):
         sim = cast_candi_fsim.T[i].copy()
         max_ind = np.argsort(sim)[-1]
         # print(max_ind,sim[max_ind])
-        if sim[max_ind] > 0.38:
+        if sim[max_ind] > 0.30:
             cast_candi_filter[max_ind, i] = 1
             movie_rank[cast_ids[max_ind]].append(candi_id)
 
