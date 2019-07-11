@@ -64,6 +64,7 @@ def load_face_2(face_data1, face_data2):
             feat2 = face_data2[movie]['cast'][index]['ffeat']
             assert cast['id'] == face_data2[movie]['cast'][index]['id']
             feat = np.hstack((feat1, feat2))
+            print(feat.shape)
             feat = sknorm(feat)
             cast_ffeats.append(feat)
             cast_ids.append(cast['id'])
