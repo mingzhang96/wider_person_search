@@ -50,6 +50,14 @@ def load_face(face_data):
         )
     return face_dict, movie_list
 
+
+def my_norm(feat):
+    temp = feat.shape
+    feat = np.reshape(feat, (1, -1))
+    feat = sknorm(feat)
+    feat = np.reshape(feat, temp)
+    return feat
+
 def load_face_2(face_data1, face_data2):
     face_dict = {}
     movie_list = []
@@ -64,8 +72,7 @@ def load_face_2(face_data1, face_data2):
             feat2 = face_data2[movie]['cast'][index]['ffeat']
             assert cast['id'] == face_data2[movie]['cast'][index]['id']
             feat = np.hstack((feat1, feat2))
-            print(feat.shape)
-            feat = sknorm(feat)
+            feat = my_norm(feat)
             cast_ffeats.append(feat)
             cast_ids.append(cast['id'])
         cast_ffeats = np.array(cast_ffeats)
@@ -77,7 +84,7 @@ def load_face_2(face_data1, face_data2):
                 feat2 = face_data2[movie]['candidates'][index]['ffeat']
                 assert candidate['id'] == face_data2[movie]['candidates'][index]['id']
                 feat = np.hstack((feat1, feat2))
-                feat = sknorm(feat)
+                feat = my_norm(feat)
                 candi_f_ids.append(candidate['id'])
                 candi_f_ffeats.append(feat)
         candi_f_ffeats = np.array(candi_f_ffeats)
@@ -135,7 +142,7 @@ def load_reid_4(reid_data1, reid_data2, reid_data3, reid_data4):
         feat3 = np.array(feat3)
         feat4 = np.array(feat4)
         feat = np.hstack((feat1, feat2, feat3, feat4))
-        feat = sknorm(feat)
+        feat = my_norm(feat)
         reid_dict_tmp[movie].update({key:feat})
     for movie, info in reid_dict_tmp.items():
         candi_ids, candi_feats = [], []
