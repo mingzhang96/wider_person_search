@@ -177,7 +177,7 @@ def multi_face_recall(cast_candi_filter, candi_f_ids, candi_candi_fsim):
                     sims.append(candi_candi_fsim[j, idx])
             sims = np.array(sims)
             max_sim = sims.max()
-            if max_sim > 0.5:
+            if max_sim > 0.4:
                 result[i,j] = 1
     recall_num = (result-cast_candi_filter).sum()
     return result, recall_num
