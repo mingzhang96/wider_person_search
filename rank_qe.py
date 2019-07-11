@@ -350,6 +350,7 @@ def rank_eval(res, label):
     all_ap = eval(res, label)
     return np.array(all_ap)
 
+
 def main(args):
     if args.is_test =='0':
         face_feat_name_r50 = 'face_em_val_model-r50-am-lfw.pkl'
