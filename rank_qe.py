@@ -261,7 +261,6 @@ def rank(movie_face, movie_reid):
     return movie_rank, recall_num
 
 
-
 def rank_lilei(movie_face, movie_reid):
     cast_ids, cast_ffeats = movie_face['cast_ids'], movie_face['cast_ffeats']
     candi_f_ids, candi_f_ffeats = movie_face['candi_f_ids'], movie_face['candi_f_ffeats']
@@ -278,7 +277,6 @@ def rank_lilei(movie_face, movie_reid):
     cast_candi_fsim = np.dot(Q, candi_f_ffeats.T)
     candi_candi_fsim = np.dot(candi_f_ffeats, candi_f_ffeats.T)
 
-
     # print(candi_feats.shape)
     candi_candi_dist = pdist(candi_feats, 'euclidean')
     candi_candi_dist = squareform(candi_candi_dist)
@@ -291,7 +289,7 @@ def rank_lilei(movie_face, movie_reid):
         sim = cast_candi_fsim.T[i].copy()
         max_ind = np.argsort(sim)[-1]
         # print(max_ind,sim[max_ind])
-        if sim[max_ind] > 0.70:
+        if sim[max_ind] > 0.60:
             cast_candi_filter[max_ind, i] = 1
             movie_rank[cast_ids[max_ind]].append(candi_id)
 
