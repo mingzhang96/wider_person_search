@@ -88,7 +88,7 @@ def main(args):
     data_raw = load_json(json_path)
     movie_num, movie_cnt = len(data_raw.keys()), 0
 
-    face_data = my_unpickle('./features/face_det_val.pkl')
+    face_data = my_unpickle('./features/face_det_test.pkl')
 
     face_dict = {}
     # det/extract val face feat
