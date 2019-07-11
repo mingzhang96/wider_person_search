@@ -1,5 +1,7 @@
 import json
+import sys
 import numpy as np
+np.set_printoptions(threshold=sys.maxsize)
 import argparse
 import os.path as osp
 
@@ -72,7 +74,10 @@ def load_face_2(face_data1, face_data2):
             feat2 = face_data2[movie]['cast'][index]['ffeat']
             assert cast['id'] == face_data2[movie]['cast'][index]['id']
             feat = np.hstack((feat1, feat2))
+            print("before", feat.shape, feat[0])
             feat = my_norm(feat)
+            print("after", feat.shape, feat[0])
+            exit()
             cast_ffeats.append(feat)
             cast_ids.append(cast['id'])
         cast_ffeats = np.array(cast_ffeats)
