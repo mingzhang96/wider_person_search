@@ -11,7 +11,6 @@ from scipy.spatial.distance import pdist, squareform
 from diffussion import *
 from crow import apply_crow_aggregation, normalize, run_feature_processing_pipeline
 from utils.re_ranking_feature import *
-from sklearn.preprocessing import normalize as sknorm
 
 
 def load_json(name):
@@ -74,7 +73,7 @@ def load_face_2(face_data1, face_data2):
             feat2 = face_data2[movie]['cast'][index]['ffeat']
             assert cast['id'] == face_data2[movie]['cast'][index]['id']
             feat = np.hstack((feat1, feat2))
-            feat = my_norm(feat)
+            feat = normalize(feat)
             cast_ffeats.append(feat)
             cast_ids.append(cast['id'])
         cast_ffeats = np.array(cast_ffeats)
@@ -86,7 +85,7 @@ def load_face_2(face_data1, face_data2):
                 feat2 = face_data2[movie]['candidates'][index]['ffeat']
                 assert candidate['id'] == face_data2[movie]['candidates'][index]['id']
                 feat = np.hstack((feat1, feat2))
-                feat = my_norm(feat)
+                feat = normalize(feat)
                 candi_f_ids.append(candidate['id'])
                 candi_f_ffeats.append(feat)
         candi_f_ffeats = np.array(candi_f_ffeats)
@@ -144,7 +143,6 @@ def load_reid_4(reid_data1, reid_data2, reid_data3, reid_data4):
         feat3 = np.array(feat3)
         feat4 = np.array(feat4)
         feat = np.hstack((feat1, feat2, feat3, feat4))
-        feat = my_norm(feat)
         reid_dict_tmp[movie].update({key:feat})
     for movie, info in reid_dict_tmp.items():
         candi_ids, candi_feats = [], []
@@ -177,7 +175,7 @@ def multi_face_recall(cast_candi_filter, candi_f_ids, candi_candi_fsim):
                     sims.append(candi_candi_fsim[j, idx])
             sims = np.array(sims)
             max_sim = sims.max()
-            if max_sim > 0.5:
+            if max_sim > 1:
                 result[i,j] = 1
     recall_num = (result-cast_candi_filter).sum()
     return result, recall_num
@@ -256,7 +254,7 @@ def rank(movie_face, movie_reid):
     for i, candi_id in enumerate(candi_f_ids):
         sim = cast_candi_fsim.T[i].copy()
         max_ind = np.argsort(sim)[-1]
-        if sim[max_ind] > 0.29:
+        if sim[max_ind] > 0.5:
             cast_candi_filter[max_ind, i] = 1
             movie_rank[cast_ids[max_ind]].append(candi_id)
     
@@ -379,10 +377,10 @@ def main(args):
         reid_feat_name_seresnext101 = 'reid_em_test_seresnext101.pkl'
 
     print('Load features from pkl ...')
-    # face_pkl_r50 = my_unpickle(osp.join('./features', face_feat_name_r50))
+    face_pkl_r50 = my_unpickle(osp.join('./features', face_feat_name_r50))
     face_pkl_r100 = my_unpickle(osp.join('./features', face_feat_name_r100))
-    # face_dict, movie_list = load_face_2(face_pkl_r50, face_pkl_r100)
-    face_dict, movie_list = load_face(face_pkl_r100)
+    face_dict, movie_list = load_face_2(face_pkl_r50, face_pkl_r100)
+    # face_dict, movie_list = load_face(face_pkl_r100)
     if args.arch is None:
         reid_pkl_resnet101 = my_unpickle(osp.join('./features', reid_feat_name_resnet101))
         reid_pkl_densenet121 = my_unpickle(osp.join('./features', reid_feat_name_densenet121))
