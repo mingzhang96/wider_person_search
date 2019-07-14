@@ -175,7 +175,7 @@ def multi_face_recall(cast_candi_filter, candi_f_ids, candi_candi_fsim):
                     sims.append(candi_candi_fsim[j, idx])
             sims = np.array(sims)
             max_sim = sims.max()
-            if max_sim > 1:
+            if max_sim > 1.0:
                 result[i,j] = 1
     recall_num = (result-cast_candi_filter).sum()
     return result, recall_num
@@ -254,7 +254,7 @@ def rank(movie_face, movie_reid):
     for i, candi_id in enumerate(candi_f_ids):
         sim = cast_candi_fsim.T[i].copy()
         max_ind = np.argsort(sim)[-1]
-        if sim[max_ind] > 0.4:
+        if sim[max_ind] > 0.5:
             cast_candi_filter[max_ind, i] = 1
             movie_rank[cast_ids[max_ind]].append(candi_id)
     
@@ -301,7 +301,7 @@ def rank_lilei(movie_face, movie_reid):
         sim = cast_candi_fsim.T[i].copy()
         max_ind = np.argsort(sim)[-1]
         # print(max_ind,sim[max_ind])
-        if sim[max_ind] > 0.38:
+        if sim[max_ind] > 0.29:
             cast_candi_filter[max_ind, i] = 1
             movie_rank[cast_ids[max_ind]].append(candi_id)
 
