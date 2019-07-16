@@ -175,7 +175,7 @@ def multi_face_recall(cast_candi_filter, candi_f_ids, candi_candi_fsim):
                     sims.append(candi_candi_fsim[j, idx])
             sims = np.array(sims)
             max_sim = sims.max()
-            if max_sim > 1.0:
+            if max_sim > 0.5:
                 result[i,j] = 1
     recall_num = (result-cast_candi_filter).sum()
     return result, recall_num
@@ -301,7 +301,7 @@ def rank_lilei(movie_face, movie_reid):
         sim = cast_candi_fsim.T[i].copy()
         max_ind = np.argsort(sim)[-1]
         # print(max_ind,sim[max_ind])
-        if sim[max_ind] > 0.29:
+        if sim[max_ind] > 0.38:
             cast_candi_filter[max_ind, i] = 1
             movie_rank[cast_ids[max_ind]].append(candi_id)
 
@@ -370,7 +370,8 @@ def main(args):
         reid_feat_name_seresnet101 = 'reid_em_val_seresnet101.pkl'
         reid_feat_name_seresnext101 = 'reid_em_val_seresnext101.pkl'
     else:
-        face_feat_name = 'face_em_test.pkl'
+        face_feat_name_r50 = 'face_em_test_model-r50-am-lfw.pkl'
+        face_feat_name_r100 = 'face_em_test_model-r100-ii.pkl'
         reid_feat_name_resnet101 = 'reid_em_test_resnet101.pkl'
         reid_feat_name_densenet121 = 'reid_em_test_densenet121.pkl'
         reid_feat_name_seresnet101 = 'reid_em_test_seresnet101.pkl'
@@ -379,8 +380,8 @@ def main(args):
     print('Load features from pkl ...')
     face_pkl_r50 = my_unpickle(osp.join('./features', face_feat_name_r50))
     face_pkl_r100 = my_unpickle(osp.join('./features', face_feat_name_r100))
-    face_dict, movie_list = load_face_2(face_pkl_r50, face_pkl_r100)
-    # face_dict, movie_list = load_face(face_pkl_r100)
+    # face_dict, movie_list = load_face_2(face_pkl_r50, face_pkl_r100)
+    face_dict, movie_list = load_face(face_pkl_r100)
     if args.arch is None:
         reid_pkl_resnet101 = my_unpickle(osp.join('./features', reid_feat_name_resnet101))
         reid_pkl_densenet121 = my_unpickle(osp.join('./features', reid_feat_name_densenet121))
