@@ -72,8 +72,8 @@ def load_face_2(face_data1, face_data2):
             feat1 = cast['ffeat']
             feat2 = face_data2[movie]['cast'][index]['ffeat']
             assert cast['id'] == face_data2[movie]['cast'][index]['id']
-            feat = np.hstack((feat1, feat2))
-            feat = normalize(feat)
+            feat = np.hstack((feat1*0.5, feat2*0.5))
+            # feat = normalize(feat)
             cast_ffeats.append(feat)
             cast_ids.append(cast['id'])
         cast_ffeats = np.array(cast_ffeats)
@@ -380,8 +380,8 @@ def main(args):
     print('Load features from pkl ...')
     face_pkl_r50 = my_unpickle(osp.join('./features', face_feat_name_r50))
     face_pkl_r100 = my_unpickle(osp.join('./features', face_feat_name_r100))
-    # face_dict, movie_list = load_face_2(face_pkl_r50, face_pkl_r100)
-    face_dict, movie_list = load_face(face_pkl_r100)
+    face_dict, movie_list = load_face_2(face_pkl_r50, face_pkl_r100)
+    # face_dict, movie_list = load_face(face_pkl_r100)
     if args.arch is None:
         reid_pkl_resnet101 = my_unpickle(osp.join('./features', reid_feat_name_resnet101))
         reid_pkl_densenet121 = my_unpickle(osp.join('./features', reid_feat_name_densenet121))
