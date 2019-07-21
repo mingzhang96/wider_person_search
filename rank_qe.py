@@ -302,7 +302,7 @@ def rank_lilei(movie_face, movie_reid):
         sim = cast_candi_fsim.T[i].copy()
         max_ind = np.argsort(sim)[-1]
         # print(max_ind,sim[max_ind])
-        if sim[max_ind] > 0.30:
+        if sim[max_ind] > 0.38:
             cast_candi_filter[max_ind, i] = 1
             movie_rank[cast_ids[max_ind]].append(candi_id)
 
