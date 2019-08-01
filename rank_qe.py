@@ -415,7 +415,7 @@ def main(args):
         rank_list.update(movie_rank)
 
     if args.is_test == '1':
-        rank2txt(rank_list, '0.5_0.45_test_rank.txt')
+        rank2txt(rank_list, '0.5_0.35_test_rank.txt')
     else:
         rank2txt(rank_list, 'val_rank.txt')
         all_ap = rank_eval('val_rank.txt', 'val_label.json')
